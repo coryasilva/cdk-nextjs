@@ -44,9 +44,8 @@ export interface ViewerRequestFunctionProps extends OptionalCloudFrontFunctionPr
    */
   readonly code?: cloudfront.FunctionCode;
 }
-
 export interface NextjsDistributionOverrides {
-  readonly viewerRequestFunction?: ViewerRequestFunctionProps;
+  readonly viewerRequestFunctionProps?: ViewerRequestFunctionProps;
   readonly distributionProps?: OptionalDistributionProps;
   readonly edgeFunctionProps?: OptionalEdgeFunctionProps;
   readonly imageBehaviorOptions?: AddBehaviorOptions;
@@ -386,7 +385,7 @@ export class NextjsDistribution extends Construct {
    */
   private createCloudFrontFnAssociations() {
     let code =
-      this.props.overrides?.viewerRequestFunction?.code?.render() ??
+      this.props.overrides?.viewerRequestFunctionProps?.code?.render() ??
       `
 async function handler(event) {
 // INJECT_CLOUDFRONT_FUNCTION_HOST_HEADER
@@ -403,7 +402,7 @@ async function handler(event) {
     );
     const cloudFrontFn = new cloudfront.Function(this, 'CloudFrontFn', {
       runtime: cloudfront.FunctionRuntime.JS_2_0,
-      ...this.props.overrides?.viewerRequestFunction,
+      ...this.props.overrides?.viewerRequestFunctionProps,
       // Override code last to get injections
       code: cloudfront.FunctionCode.fromInline(code),
     });
